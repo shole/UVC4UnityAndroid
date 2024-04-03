@@ -12,6 +12,7 @@ namespace Serenegiant.UVC
 {
 	/**
 	 * UVC機器のフィルタ定義クラス
+	 * Filter Definition Classes for UVC Devices
 	 */
 	[Serializable]
 	public class UVCFilter
@@ -20,25 +21,33 @@ namespace Serenegiant.UVC
 
 		/**
 		 * インスペクタでフィルターのコメントを表示するための文字列(スクリプトでは使わない)
+		 * A string to display the filter's comments in the inspector (not used in scripts)
 		 */
 		public string Description;
 		/**
 		 * マッチするベンダーID
 		 * 0なら全てにマッチする
+		 * Matching Vendor ID
+		 * 0 matches everything
 		 */
 		public int Vid;
 		/**
 		 * マッチするプロダクトID
 		 * 0なら全てにマッチする
+		 * Matching Product IDs
+		 * 0 matches everything
 		 */
 		public int Pid;
 		/**
 		 * マッチする機器名
 		 * null/emptyならチェックしない
+		 * Matching device name
+		 * If null/empty, don't check
 		 */
 		public string DeviceName;
 		/**
 		 * 除外フィルタとして扱うかどうか
+		 * Whether to treat it as an exclusion filter
 		 */
 		public bool IsExclude;
 
@@ -46,6 +55,7 @@ namespace Serenegiant.UVC
 
 		/**
 		 * 引数のUVC機器にマッチするかどうかを取得
+		 * Get whether or not the argument matches the UVC device
 		 * @param device
 		 */
 		public bool Match(UVCDevice device)
@@ -74,6 +84,10 @@ namespace Serenegiant.UVC
 		 * filtersがnullの場合はマッチしたことにする
 		 * 除外フィルターにヒットしたときはその時点で評価を終了しfalseを返す
 		 * 除外フィルターにヒットせず通常フィルターのいずれかにヒットすればtrueを返す
+		 * For filtering UVC equipment
+		 * If filters is null, match
+		 * When the exclusion filter is hit, the evaluation is terminated at that point and false is returned.
+		 * Returns true if the exclusion filter is not hit, and one of the normal filters is hit.
 		 * @param device
 		 * @param filters Nullable
 		 */
@@ -87,6 +101,10 @@ namespace Serenegiant.UVC
 		 * filtersがnullの場合はマッチしたことにする
 		 * 除外フィルターにヒットしたときはその時点で評価を終了しfalseを返す
 		 * 除外フィルターにヒットせず通常フィルターのいずれかにヒットすればtrueを返す
+		 * For filtering UVC equipment
+		 * If filters is null, match
+		 * When the exclusion filter is hit, the evaluation is terminated at that point and false is returned.
+		 * Returns true if the exclusion filter is not hit, and one of the normal filters is hit.
 		 * @param device
 		 * @param filters Nullable
 		 */
@@ -104,17 +122,20 @@ namespace Serenegiant.UVC
 						var b = filter.Match(device);
 						if (b && filter.IsExclude)
 						{   // 除外フィルターにヒットしたときはその時点でフィルタ処理を終了
+							// When an exclusion filter is hit, the filtering is terminated at that point.
 							result = false;
 							break;
 						}
 						else
 						{   // どれか一つにヒットすればいい
+							// All you have to do is hit one of them
 							result |= b;
 						}
 					}
 					else
 					{
 						// 空フィルターはマッチしたことにする
+						// Empty filter determines matched
 						result = true;
 					}
 

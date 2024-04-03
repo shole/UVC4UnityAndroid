@@ -30,6 +30,7 @@ namespace Serenegiant.UVC
 
         //--------------------------------------------------------------------------------
         // Camera Terminal DescriptorのbmControlsフィールドのビットマスク
+        // Bitmask of bmControls field of Camera Terminal Descriptor
         private const UInt64 CTRL_SCANNING		= 0x00000001;	// D0:  Scanning Mode
         private const UInt64 CTRL_AE			= 0x00000002;	// D1:  Auto-Exposure Mode
         private const UInt64 CTRL_AE_PRIORITY	= 0x00000004;	// D2:  Auto-Exposure Priority
@@ -60,6 +61,7 @@ namespace Serenegiant.UVC
         private const UInt64 CTRL_D23			= 0x00800000;	// D23: Reserved
 
         // Processing Unit DescriptorのbmControlsフィールドのビットマスク
+        // Bitmask of bmControls field of Processing Unit Descriptor
         private const UInt64 PU_BRIGHTNESS		= 0x00000001;	// D0: Brightness
         private const UInt64 PU_CONTRAST		= 0x00000002;	// D1: Contrast
         private const UInt64 PU_HUE				= 0x00000004;	// D2: Hue
@@ -86,6 +88,7 @@ namespace Serenegiant.UVC
         private const UInt64 PU_D23				= 0x00800000;   // D23: Reserved
 
         // プロセッシングユニットのコントロールタイプを識別するために最上位ビットを立てる
+        // Set the most significant bit to identify the control type of the processing unit
         private const UInt64 PU_MASK = 0x80000000;
 
         //--------------------------------------------------------------------------------
@@ -144,39 +147,52 @@ namespace Serenegiant.UVC
 		 * IUVCSelectorがセットされていないとき
 		 * またはIUVCSelectorが解像度選択時にnullを
 		 * 返したときのデフォルトの解像度(幅)
+		 * When IUVCSelector is not set
+		 * or IUVCSelector returns null when selecting resolution
+		 * Default resolution (width) when returned
 		*/
         public Int32 DefaultWidth = 1280;
 		/**
 		 * IUVCSelectorがセットされていないとき
 		 * またはIUVCSelectorが解像度選択時にnullを
 		 * 返したときのデフォルトの解像度(高さ)
+		 * When IUVCSelector is not set
+		 * or IUVC Selector returns null when selecting resolution
+		 * Default resolution (height) when returned
 		 */
 		public Int32 DefaultHeight = 720;
 		/**
 		 * UVC機器とのネゴシエーション時に
 		 * H.264を優先してネゴシエーションするかどうか
 		 * Android実機のみ有効
+		 * When negotiating with UVC equipment
+		 * Whether to negotiate with H.264 as a priority
+		 * Valid only on actual Android devices
 		 * true:	H.264 > MJPEG > YUV
 		 * false:	MJPEG > H.264 > YUV
 		 */
 		public bool PreferH264 = false;
 		/**
 		 * 可能な場合にUACから音声取得を行うかどうか
+		 * Whether to perform audio retrieval from UAC when possible
 		 */
 		public bool UACEnabled = false;
         /**
          * シーンレンダリングの前にUVC機器映像のテクスチャへのレンダリング要求を行うかどうか
+         * Whether to request rendering of the UVC device image texture before scene rendering
          */
         public bool RenderBeforeSceneRendering = false;
 
 		/**
 		 * UVC関係のイベンドハンドラー
+		 * UVC related event handler
 		 */
 		[SerializeField, ComponentRestriction(typeof(IUVCDrawer))]
 		public Component[] UVCDrawers;
 
 		/**
 		 * 使用中のカメラ情報を保持するホルダークラス
+		 * Holder class that holds camera information in use
 		 */
 		public class CameraInfo
 		{
@@ -197,6 +213,7 @@ namespace Serenegiant.UVC
 
 			/**
 			 * 機器idを取得
+			 * Get device ID
 			 */
 			public Int32 Id{
 				get { return device.id;  }
@@ -204,6 +221,7 @@ namespace Serenegiant.UVC
 	
 			/**
 			 * 機器名を取得
+			 * Get device name
 			 */
 			public string DeviceName
 			{
@@ -212,6 +230,7 @@ namespace Serenegiant.UVC
 
 			/**
 			 * ベンダーIDを取得
+			 * Get vendor ID
 			 */
 			public int Vid
 			{
@@ -220,6 +239,7 @@ namespace Serenegiant.UVC
 
 			/**
 			 * プロダクトIDを取得
+			 * Get product ID
 			 */
 			public int Pid
 			{
@@ -228,6 +248,7 @@ namespace Serenegiant.UVC
 
 			/**
 			 * 映像取得中かどうか
+			 * Whether or not the image is being acquired
 			 */
 			public bool IsPreviewing
 			{
@@ -237,6 +258,8 @@ namespace Serenegiant.UVC
 			/**
 			 * 現在の解像度(幅)
 			 * プレビュー中でなければ0
+			 * Current resolution (width)
+			 * 0 if not in preview
 			 */
 			public Int32 CurrentWidth
 			{
@@ -246,6 +269,8 @@ namespace Serenegiant.UVC
 			/**
 			 * 現在の解像度(高さ)
 			 * プレビュー中でなければ0
+			 * Current resolution (height)
+			 * 0 if not in preview
 			 */
 			public Int32 CurrentHeight
 			{
@@ -254,6 +279,7 @@ namespace Serenegiant.UVC
 
 			/**
 			 * 現在の解像度を変更
+			 * Change current resolution
 			 * @param width
 			 * @param height
 			 */
@@ -265,6 +291,7 @@ namespace Serenegiant.UVC
 
 			/**
 			 * サポートしているUVCコントロール/プロセッシング機能の情報を更新する
+			 * Update information on supported UVC control/processing functions
 			 */
 			public void UpdateCtrls()
 			{
@@ -305,6 +332,7 @@ namespace Serenegiant.UVC
 
 			/**
 			 * 対応しているUVCコントロール/プロセッシング機能のtype一覧を取得
+			 * Get a list of supported UVC control/processing function types
 			 */
 			public List<UInt64> GetCtrls()
 			{
@@ -313,6 +341,7 @@ namespace Serenegiant.UVC
 
 			/**
 			 * 指定したUVCコントロール/プロセッシング機能の情報を取得
+			 * Get information on specified UVC control/processing function
 			 * @param type
 			 * @return UVCCtrlInfo
 			 * @throws ArgumentOutOfRangeException
@@ -331,8 +360,10 @@ namespace Serenegiant.UVC
 
 			/**
 			 * UVCコントロール/プロセッシング機能の設定値を取得
+			 * Get UVC control/processing function settings
 			 * @param type
 			 * @return 変更後の値
+			 * @return Value after change
 			 * @throws ArgumentOutOfRangeException
 			 * @throws Exception
 			 */
@@ -357,9 +388,11 @@ namespace Serenegiant.UVC
 
 			/**
 			 * UVCコントロール/プロセッシング機能の設定変更
+			 * UVC control/processing function setting changes
 			 * @param type
 			 * @param value
 			 * @return 変更後の値
+			 * @return Value after change
 			 * @throws ArgumentOutOfRangeException
 			 * @throws Exception
 			 */
@@ -402,6 +435,7 @@ namespace Serenegiant.UVC
 
             /**
              * UVC機器からの映像のレンダリングを開始
+             * Start rendering video from UVC equipment
              * @param manager
              */
             internal Coroutine StartRender(UVCManager manager, bool renderBeforeSceneRendering)
@@ -420,6 +454,7 @@ namespace Serenegiant.UVC
 
             /**
              * UVC機器からの映像のレンダリングを終了
+             * Finish rendering video from UVC equipment
              * @param manager
              */
             internal void StopRender(UVCManager manager)
@@ -442,6 +477,9 @@ namespace Serenegiant.UVC
 			 * レンダーイベント処理用
 			 * コールーチンとして実行される
              * シーンレンダリングの前にUVC機器からの映像をテクスチャへレンダリング要求する
+			 * For rendering event processing
+			 * executed as a coroutine
+             * Request rendering of image from UVC device to texture before scene rendering
 			 */
             private IEnumerator OnRenderBeforeSceneRendering()
 			{
@@ -458,6 +496,9 @@ namespace Serenegiant.UVC
              * レンダーイベント処理用
              * コールーチンとして実行される
              * レンダリング後にUVC機器からの映像をテクスチャへレンダリング要求する
+			 * For rendering event processing
+             * executed as a coroutine
+             * Request rendering of image from UVC device to texture after rendering
              */
             private IEnumerator OnRender()
             {
@@ -474,6 +515,7 @@ namespace Serenegiant.UVC
 
 		/**
 		 * UAC機器からの音声取得に関するオブジェクトを保持するためのホルダークラス
+		 * Holder class to hold objects related to audio acquisition from UAC devices
 		 */
 		public class AudioInfo
 		{
@@ -492,6 +534,7 @@ namespace Serenegiant.UVC
 
 			/**
 			 * 音声取得中かどうか
+			 * Whether audio is being acquired
 			 */
 			public bool IsStreaming
 			{
@@ -501,6 +544,8 @@ namespace Serenegiant.UVC
 			/**
 			 * 音声取得開始する
 			 * すでに音声取得中なら何もしない
+			 * Start audio acquisition
+			 * If audio is already being acquired, do nothing
 			 * @param manager
 			 */
 			internal AudioClip Start(UVCManager manager)
@@ -545,6 +590,7 @@ namespace Serenegiant.UVC
 
 			/**
 			 * 音声取得停止する
+			 * Stop audio acquisition
 			 * @param manager
 			 */
 			internal void Stop(UVCManager manager)
@@ -560,6 +606,7 @@ namespace Serenegiant.UVC
 
 			/**
 			 * AudioClipからのコールバック
+			 * Callback from Audio Clip
 			 * @param data
 			 */
 			private void OnPCM16Read(float[] data)
@@ -609,30 +656,38 @@ namespace Serenegiant.UVC
 
 		/**
 		 * メインスレッド上で実行するためのSynchronizationContextインスタンス
+		 * Synchronization Context instance to run on the main thread
 		 */
 		private SynchronizationContext mainContext;
 		/**
 		 * 端末に接続されたUVC機器の状態が変化した時のイベントコールバックを受け取るデリゲーター
+		 * A delegator that receives event callbacks when the state of the UVC device connected to the device changes.
 		 */
 		private PluginCallbackManager.OnDeviceChangedFunc callback;
 		/**
 		 * 端末に接続されたUVC機器リスト
+		 * UVC device list connected to the device
 		 */
 		private List<UVCDevice> attachedDevices = new List<UVCDevice>();
 		/**
 		 * 映像取得中のUVC機器のマップ
 		 * 機器識別用のid - CameraInfoペアを保持する
+		 * Map of UVC equipment during image acquisition
+		 * Maintains an id-CameraInfo pair for device identification
 		 */
 		private Dictionary<Int32, CameraInfo> cameraInfos = new Dictionary<int, CameraInfo>();
 
 		/**
 		 * 音声取得中のUVC機器のマップ
 		 * 機器識別用のid - AudioInfoペアを保持する
+		 * Map of UVC equipment during audio acquisition
+		 * Holds an id-AudioInfo pair for device identification
 		 */
 		private Dictionary<Int32, AudioInfo> audioInFos = new Dictionary<int, AudioInfo>();
 
 		//--------------------------------------------------------------------------------
 		// UnityEngineからの呼び出し
+		// Call from Unity Engine
 		//--------------------------------------------------------------------------------
 		// Start is called before the first frame update
 		IEnumerator Start()
@@ -678,6 +733,7 @@ namespace Serenegiant.UVC
 
 		//--------------------------------------------------------------------------------
 		// UVC機器接続状態が変化したときのプラグインからのコールバック関数
+		// Callback function from plugin when UVC device connection status changes
 		//--------------------------------------------------------------------------------
         public void OnDeviceChanged(IntPtr devicePtr, bool attached)
         {
@@ -723,6 +779,8 @@ namespace Serenegiant.UVC
 		/**
 		 * 接続中のUVC機器一覧を取得
 		 * @return 接続中のUVC機器一覧List
+		 * Get a list of connected UVC devices
+		 * @return List of connected UVC devices
 		 */
 		public List<CameraInfo> GetAttachedDevices()
 		{
@@ -731,8 +789,11 @@ namespace Serenegiant.UVC
 
 //		/**
 //		 * 対応解像度を取得
+//		 * Get supported resolutions
 //		 * @param camera 対応解像度を取得するUVC機器を指定
+//		 * @param camera Specify the UVC device to obtain the compatible resolution
 //		 * @return 対応解像度 既にカメラが取り外されている/closeしているのであればnull
+//		 * @return Supported resolution null if the camera has already been removed/closed
 //		 */
 //		public SupportedFormats GetSupportedVideoSize(CameraInfo camera)
 //		{
@@ -749,9 +810,13 @@ namespace Serenegiant.UVC
 
 //		/**
 //		 * 解像度を変更
+//		 * change resolution
 //		 * @param 解像度を変更するUVC機器を指定
+//		 * @param Specify the UVC device whose resolution you want to change
 //		 * @param 変更する解像度を指定, nullならデフォルトに戻す
+//		 * @param Specify resolution to change, return to default if null
 //		 * @param 解像度が変更されたかどうか
+//		 * @param whether the resolution has changed
 //		 */
 //		public bool SetVideoSize(CameraInfo camera, SupportedFormats.Size size)
 //		{
@@ -762,6 +827,7 @@ namespace Serenegiant.UVC
 //			{
 //				if ((width != info.CurrentWidth) || (height != info.CurrentHeight))
 //				{   // 解像度が変更になるとき
+//					// When the resolution changes
 //					StopPreview(info.DeviceName);
 //					StartPreview(info.DeviceName, width, height);
 //					return true;
@@ -785,6 +851,7 @@ namespace Serenegiant.UVC
 //				}
 
 //				// 解像度の選択処理
+//				// Resolution selection process
 //				if ((UVCDrawers != null) && (UVCDrawers.Length > 0))
 //				{
 //					foreach (var drawer in UVCDrawers)
@@ -797,6 +864,7 @@ namespace Serenegiant.UVC
 //#endif
 //							if (size != null)
 //							{   // 一番最初に見つかった描画可能なIUVCDrawersがnull以外を返せばそれを使う
+//								// If the first drawable IUVCDrawers found returns non-null, use it
 //								width = size.Width;
 //								height = size.Height;
 //								break;
@@ -806,6 +874,7 @@ namespace Serenegiant.UVC
 //				}
 
 				// FIXME 対応解像度の確認処理
+				// FIXME Compatible resolution confirmation process
 #if (!NDEBUG && DEBUG && ENABLE_LOG)
 				Console.WriteLine($"{TAG}StartPreview:({width}x{height}),id={device.id}");
 #endif
@@ -827,8 +896,10 @@ namespace Serenegiant.UVC
 				info.UpdateCtrls();
 				mainContext.Post(__ =>
 				{   // テクスチャの生成はメインスレッドで行わないといけない
+					// Texture generation must be done on the main thread
 #if (!NDEBUG && DEBUG && ENABLE_LOG)
-					Console.WriteLine($"{TAG}映像受け取り用テクスチャ生成:({width}x{height})");
+					// Console.WriteLine($"{TAG}映像受け取り用テクスチャ生成:({width}x{height})");
+					Console.WriteLine($"{TAG}Texture generation for video reception:({width}x{height})");
 #endif
 					Texture2D tex = new Texture2D(
 							width, height,
@@ -916,8 +987,10 @@ namespace Serenegiant.UVC
 		//--------------------------------------------------------------------------------
 		/**
 		 * UVC機器が接続されたときの処理の実体
+		 * Processing substance when UVC equipment is connected
 		 * @param info
 		 * @return true: 接続されたUVC機器を使用する, false: 接続されたUVC機器を使用しない
+		 * @return true: Use connected UVC device, false: Do not use connected UVC device
 		 */
 		private bool HandleOnAttachEvent(UVCDevice device/*NonNull*/)
 		{
@@ -946,6 +1019,7 @@ namespace Serenegiant.UVC
 
 		/**
 		 * UVC機器が取り外されたときの処理の実体
+		 * Processing substance when UVC equipment is removed
 		 * @param info
 		 */
 		private void HandleOnDetachEvent(UVCDevice device/*NonNull*/)
@@ -964,7 +1038,9 @@ namespace Serenegiant.UVC
 
 		/**
 		 * UVC機器からの映像取得を開始した
+		 * Started acquiring images from UVC equipment
 		 * @param args UVC機器の識別文字列
+		 * @param args UVC device identification string
 		 */
 		void HandleOnStartPreviewEvent(CameraInfo camera)
 		{
@@ -989,7 +1065,9 @@ namespace Serenegiant.UVC
 
 		/**
 		 * UVC機器からの映像取得を終了した
+		 * Finished acquiring images from UVC equipment.
 		 * @param args UVC機器の識別文字列
+		 * @param args UVC device identification string
 		 */
 		void HandleOnStopPreviewEvent(CameraInfo camera)
 		{
@@ -1019,6 +1097,7 @@ namespace Serenegiant.UVC
 				{
 					if ((drawer is IUVCDrawer) && (drawer as IUVCDrawer).IsUACEnabled(this, audio.device))
 					{   // IsUACEnabledがtrueを返したIUVCDrawerだけOnUACStartEventを呼び出す
+						// Call OnUACStartEvent only for IUVCDrawer whose IsUACEnabled returns true
 						(drawer as IUVCDrawer).OnUACStartEvent(this, audio.device, audioClip);
 					}
 				}
@@ -1036,6 +1115,7 @@ namespace Serenegiant.UVC
 				{
 					if ((drawer is IUVCDrawer) && (drawer as IUVCDrawer).IsUACEnabled(this, audio.device))
 					{   // IsUACEnabledがtrueを返したIUVCDrawerだけOnUACStopEventを呼び出す
+						// Call OnUACStopEvent only for IUVCDrawer whose IsUACEnabled returns true
 						(drawer as IUVCDrawer).OnUACStopEvent(this, audio.device);
 					}
 				}
@@ -1046,8 +1126,12 @@ namespace Serenegiant.UVC
 		/**
 		 * 指定したUVC識別文字列に対応するCameraInfoを取得する
 		 * まだ登録させていなければ新規作成する
+		 * Get Camera Info corresponding to the specified UVC identification string
+		 * Create a new one if you haven't registered it yet.
 		 * @param deviceName UVC機器識別文字列
+		 * @param deviceName UVC machine recognition text column
 		 * @param CameraInfoを返す
+		 * @param Return CameraInfo
 		 */
 		/*NonNull*/
 		private CameraInfo CreateCameraIfNotExist(UVCDevice device)
@@ -1061,8 +1145,10 @@ namespace Serenegiant.UVC
 
 		/**
 		 * 指定したUVC識別文字列に対応するCameraInfoを取得する
+		 * Get Camera Info corresponding to the specified UVC identification string
 		 * @param device
 		 * @param 登録してあればCameraInfoを返す、登録されていなければnull
+		 * @param Return CameraInfo if registered, null if not registered
 		 */
 		/*Nullable*/
 		private CameraInfo GetCamera(UVCDevice device)
@@ -1072,8 +1158,10 @@ namespace Serenegiant.UVC
 
 		/**
 		 * 指定したUVCDeviceに対応するCameraInfoを削除する
+		 * Delete Camera Info corresponding to the specified UVC Device
 		 * @param device
 		 * @param 対応するAudioInfoまたはnull
+		 * @param the corresponding Audio Info or null
 		 */
 		private CameraInfo RemoveCamera(UVCDevice device)
 		{
@@ -1086,8 +1174,12 @@ namespace Serenegiant.UVC
 		/**
 		 * 指定したUVC識別文字列に対応するCameraInfoを取得する
 		 * まだ登録させていなければ新規作成する
+		 * Get Camera Info corresponding to the specified UVC identification string
+		 * Create a new one if you haven't registered it yet.
 		 * @param deviceName UVC機器識別文字列
+		 * @param deviceName UVC machine recognition text column
 		 * @param CameraInfoを返す
+		 * @param Return CameraInfo
 		 */
 		/*NonNull*/
 		private AudioInfo CreateAudioIfNotExist(UVCDevice device)
@@ -1101,8 +1193,10 @@ namespace Serenegiant.UVC
 
 		/**
 		 * 指定したUVCDeviceに対応するAudioInfoを取得する
+		 * Get Audio Info corresponding to the specified UVC Device
 		 * @param device
 		 * @param 登録してあればAudioInfoを返す、登録されていなければnull
+		 * @param Returns AudioInfo if registered, null if not registered
 		 */
 		/*Nullable*/
 		private AudioInfo GetAudio(UVCDevice device)
@@ -1112,8 +1206,10 @@ namespace Serenegiant.UVC
 
 		/**
 		 * 指定したUVCDeviceに対応するAudioInfoを削除する
+		 * Delete Audio Info corresponding to the specified UVC Device
 		 * @param device
 		 * @param 対応するAudioInfoまたはnull
+		 * @param the corresponding Audio Info or null
 		 */
 		private AudioInfo RemoveAudio(UVCDevice device)
 		{
@@ -1127,6 +1223,8 @@ namespace Serenegiant.UVC
 		/**
 		 * プラグインを初期化
 		 * パーミッションの確認を行って取得できれば実際のプラグイン初期化処理#InitPluginを呼び出す
+		 * Initialize plugin
+		 * Check the permission and if it can be obtained, call the actual plugin initialization process #InitPlugin
 		 */
 		private IEnumerator Initialize()
 		{
@@ -1149,7 +1247,9 @@ namespace Serenegiant.UVC
 							if (AndroidUtils.ShouldShowRequestPermissionRationale(AndroidUtils.PERMISSION_CAMERA))
 							{
 								// パーミッションを取得できなかった
+								// Could not get permission
 								// FIXME 説明用のダイアログ等を表示しないといけない
+								// FIXME It is necessary to display an explanation dialog etc.
 							}
 							break;
 						case AndroidUtils.PermissionGrantResult.PERMISSION_DENY_AND_NEVER_ASK_AGAIN:
@@ -1168,6 +1268,8 @@ namespace Serenegiant.UVC
 		/**
 		 * プラグインを初期化
 		 * uvc-plugin-unityへの処理要求
+		 * Initialize plugin
+		 * Processing request to uvc-plugin-unity
 		 */
 		private void InitPlugin()
 		{
@@ -1175,6 +1277,7 @@ namespace Serenegiant.UVC
 			Console.WriteLine($"{TAG}InitPlugin:");
 #endif
 			// IUVCDrawersが割り当てられているかどうかをチェック
+			// Check if IUVC Drawers are assigned
 			var hasDrawer = false;
 			if ((UVCDrawers != null) && (UVCDrawers.Length > 0))
 			{
@@ -1190,6 +1293,8 @@ namespace Serenegiant.UVC
 			if (!hasDrawer)
 			{   // インスペクタでIUVCDrawerが設定されていないときは
 				// このスクリプトがaddされているゲームオブジェクトからの取得を試みる
+				// When IUVC Drawer is not set in the inspector
+				// Attempts to retrieve from the game object to which this script is added
 #if (!NDEBUG && DEBUG && ENABLE_LOG)
 				Console.WriteLine($"{TAG}InitPlugin:has no IUVCDrawer, try to get from gameObject");
 #endif
@@ -1208,6 +1313,7 @@ namespace Serenegiant.UVC
 			Console.WriteLine($"{TAG}InitPlugin:num drawers={UVCDrawers.Length}");
 #endif
 			// aandusbのDeviceDetectorを読み込み要求
+			// Request to load aandusb's Device Detector
 			using (AndroidJavaClass clazz = new AndroidJavaClass(FQCN_DETECTOR))
 			{
 				clazz.CallStatic("initUVCDeviceDetector",
@@ -1217,74 +1323,89 @@ namespace Serenegiant.UVC
 
         //--------------------------------------------------------------------------------
         // ネイティブプラグイン関係の定義・宣言
+        //Definitions and declarations related to native plugins
         //--------------------------------------------------------------------------------
 		/**
 		 * プラグインでのレンダーイベント取得用native(c/c++)関数
+		 * Native (c/c++) functions for getting render events in plugins
 		 */
 		[DllImport("unityuvcplugin")]
 		private static extern IntPtr GetRenderEventFunc();
         /**
 		 * 初期設定
+		 * Initial setting
 		 */
         [DllImport("unityuvcplugin", EntryPoint = "Config")]
         private static extern Int32 Config(Int32 deviceId, Int32 enabled, Int32 useFirstConfig);
         /**
 		 * 映像取得開始
+		 * Start acquiring images
 		 */
         [DllImport("unityuvcplugin", EntryPoint ="Start")]
 		private static extern Int32 Start(Int32 deviceId, Int32 tex);
 		/**
 		 * 映像取得終了
+		 * Image acquisition completed
 		 */
 		[DllImport("unityuvcplugin", EntryPoint ="Stop")]
 		private static extern Int32 Stop(Int32 deviceId);
 		/**
 		 * 映像サイズ設定
+		 * Video size settings
 		 */
 		[DllImport("unityuvcplugin")]
 		private static extern Int32 Resize(Int32 deviceId, Int32 frameType, Int32 width, Int32 height);
         /**
 		 * 対応するUVCコントロール機能マスクを取得
+		 * Get the corresponding UVC control function mask
 		 */
         [DllImport("unityuvcplugin")]
         private static extern UInt64 GetCtrlSupports(Int32 deviceId);
         /**
 		 * 対応するUVCプロセッシング機能マスクを取得
+		 * Get the corresponding UVC processing feature mask
 		 */
         [DllImport("unityuvcplugin")]
         private static extern UInt64 GetProcSupports(Int32 deviceId);
         /**
 		 * 対応するUVCコントロール/プロセッシング機能情報を取得
+		 * Get corresponding UVC control/processing function information
 		 */
         [DllImport("unityuvcplugin", CallingConvention=CallingConvention.StdCall)]
         private static extern Int32 GetCtrlInfo(Int32 deviceId, ref UVCCtrlInfo info);
         /**
 		 * 対応するUVCコントロール/プロセッシング機能設定値を取得
+		 * Get corresponding UVC control/processing function settings
 		 */
         [DllImport("unityuvcplugin")]
         private static extern Int32 GetCtrlValue(Int32 deviceId, UInt64 ctrl, ref Int32 value);
         /**
 		 * 対応するUVCコントロール/プロセッシング機能設定値を設定
+		 * Set corresponding UVC control/processing function settings
 		 */
         [DllImport("unityuvcplugin")]
         private static extern Int32 SetCtrlValue(Int32 deviceId, UInt64 ctrl, Int32 value);
         /**
 		 * UACからの音声取得開始
+		 * Start acquiring audio from UAC
 		 */
         [DllImport("unityuvcplugin")]
         private static extern Int32 StartUAC(Int32 deviceId);
         /**
 		 * UACからの音声取得終了
+		 * Audio acquisition from UAC completed
 		 */
         [DllImport("unityuvcplugin")]
         private static extern Int32 StopUAC(Int32 deviceId);
         /**
 		 * 対応するUVCコントロール/プロセッシング機能情報を取得
+		 * Get corresponding UVC control/processing function information
 		 */
         [DllImport("unityuvcplugin", CallingConvention = CallingConvention.StdCall)]
         private static extern Int32 GetUACInfo(Int32 deviceId, ref UACInfo info);
 		/**
 		 * UACからの音声データを取得(呼び出し元スレッドを最大で500ミリ秒ブロックする)
+		 * Get audio data from UAC (blocks calling thread for up to 500ms)
 		 */
 		[DllImport("unityuvcplugin", CallingConvention = CallingConvention.StdCall)]
 		private static extern Int32 GetUACFrame(Int32 deviceId, short[] data, ref Int32 dataLen, ref Int64 ptsUs);
@@ -1295,20 +1416,27 @@ namespace Serenegiant.UVC
      * staticなクラス・関数で処理をしないといけない。
      * だだしそれだと呼び出し元のオブジェクトの関数を呼び出せないのでマネージャークラスを作成
      * とりあえずはUVCManagerだけを受け付けるのでインターフェースにはしていない
+     * With IL2Cpp, it is not possible to marshal the delegator used for callback from c/c++.
+     * Must be processed using static classes/functions.
+     * But in that case, you can't call the function of the calling object, so create a manager class.
+     * For now, only UVCManager is accepted, so it is not used as an interface.
      */
 	public static class PluginCallbackManager
     {
         //コールバック関数の型を宣言
+        //Declare the type of the callback function
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         public delegate void OnDeviceChangedFunc(Int32 id, IntPtr devicePtr, bool attached);
 
         /**
 		 * プラグインのnative側登録関数
+		 * Plugin native side registration function
 		 */
         [DllImport("unityuvcplugin")]
         private static extern IntPtr Register(Int32 id, OnDeviceChangedFunc deviceChanged);
         /**
 		 * プラグインのnative側登録解除関数
+		 * Plugin native side unregistration function
 		 */
         [DllImport("unityuvcplugin")]
         private static extern IntPtr Unregister(Int32 id);
@@ -1317,6 +1445,7 @@ namespace Serenegiant.UVC
   
         /**
          * 指定したUVCManagerを接続機器変化コールバックに追加
+         * Add the specified UVC Manager to the connected device change callback
          */
         public static OnDeviceChangedFunc Add(UVCManager manager)
         {
@@ -1329,6 +1458,7 @@ namespace Serenegiant.UVC
 
         /**
          * 指定したUVCManagerを接続機器変化コールバックから削除
+         * Delete the specified UVC Manager from the connected device change callback.
          */
         public static void Remove(UVCManager manager)
         {

@@ -9,6 +9,11 @@
  * 追加するとコンソール出力を無効化できる。
  * ただしUnityEngine.Debug.Logのようにフルパス指定している場合には
  * 無効化できない。
+ * If you want to suppress the output to the console by Debug.Log, etc.
+ * NDEBUG in Player Settings Scripting Define Symbols
+ * Add to disable console output.
+ * However, if the full path is specified such as UnityEngine.Debug.Log,
+ * cannot be disabled.
  */
 using UnityEngine;
 using System.Diagnostics;

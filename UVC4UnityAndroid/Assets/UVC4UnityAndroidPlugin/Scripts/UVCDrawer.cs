@@ -1,4 +1,5 @@
-﻿//#define ENABLE_LOG
+﻿#define ENABLE_LOG
+#define DEBUG
 /*
  * Copyright (c) 2014 - 2022 t_saki@serenegiant.com 
  */
@@ -18,16 +19,23 @@ namespace Serenegiant.UVC
 		 * IUVCSelectorがセットされていないとき
 		 * またはIUVCSelectorが解像度選択時にnullを
 		 * 返したときのデフォルトの解像度(幅)
+		 * When IUVCSelector is not set
+		 * or IUVCSelector returns null when selecting resolution
+		 * Default resolution (width) when returned
 		 */
 		public int DefaultWidth = 1280;
 		/**
 		 * IUVCSelectorがセットされていないとき
 		 * またはIUVCSelectorが解像度選択時にnullを
 		 * 返したときのデフォルトの解像度(高さ)
+		 * When IUVCSelector is not set
+		 * or IUVCSelector returns null when selecting resolution
+		 * Default resolution (height) when returned
 		 */
 		public int DefaultHeight = 720;
 		/**
 		 * 可能な場合にUACから音声取得を行うかどうか
+		 * Whether to perform audio retrieval from UAC when possible
 		 */
 		public bool UACEnabled = false;
 		/**
@@ -38,11 +46,15 @@ namespace Serenegiant.UVC
 		/**
 		 * UVC機器からの映像の描画先Materialを保持しているGameObject
 		 * 設定していない場合はこのスクリプトを割当てたのと同じGameObjecを使う。
+		 * GameObject that holds the material where the image from the UVC device is drawn.
+		 * If not set, use the same GameObject to which this script is assigned.
 		 */
 		public List<GameObject> RenderTargets;
 		/**
 		 * UVC機器のUAC機能で取得した音声を再生するために使用するAudioSourceを保持するGameObject
 		 * 設定していない場合はこのスクリプトを割当てたのと同じGameObjecを使う。
+		 * GameObject that holds the AudioSource used to play the audio obtained by the UAC function of the UVC device
+		 * If not set, use the same GameObject to which this script is assigned.
 		 */
 		public GameObject AudioTarget;
 	
@@ -53,17 +65,24 @@ namespace Serenegiant.UVC
 		 * UVC機器からの映像の描画先Material
 		 * TargetGameObjectから取得する
 		 * 優先順位：
+		 * Material to which images from UVC equipment are drawn
+		 * Get from TargetGameObject
+		 * Priority:
 		 *	 TargetGameObjectのSkybox
 		 *	 > TargetGameObjectのRenderer
 		 *	 > TargetGameObjectのRawImage
 		 *	 > TargetGameObjectのMaterial
 		 * いずれの方法でも取得できなければStartでUnityExceptionを投げる
+		 * If it cannot be obtained by either method, a Unity Exception will be thrown at Start.
 		 */
 		private UnityEngine.Object[] TargetMaterials;
 		/**
 		 * オリジナルのテクスチャ
 		 * UVCカメラ映像受け取り用テクスチャをセットする前に
 		 * GetComponent<Renderer>().material.mainTextureに設定されていた値
+		 * Original texture
+		 * Before setting the texture for receiving UVC camera images
+		 * The value set in GetComponent<Renderer>().material.mainTexture
 		 */
 		private Texture[] SavedTextures;
 
@@ -95,6 +114,11 @@ namespace Serenegiant.UVC
 		 * @param manager 呼び出し元のUVCManager
 		 * @param device 対象となるUVC機器の情報
 		 * @return true: UVC機器を使用する, false: UVC機器を使用しない
+		 * UVC equipment connected
+		 * Implementation of IOnUVCAtachHandler
+		 * @param manager UVCMager of the caller
+		 * @param device Information about the target UVC device
+		 * @return true: use UVC equipment, false: do not use UVC equipment
 		 */
 		public bool OnUVCAttachEvent(UVCManager manager, UVCDevice device)
 		{
@@ -104,6 +128,9 @@ namespace Serenegiant.UVC
 			// XXX 今の実装では基本的に全てのUVC機器を受け入れる
 			// ただしTHETA SとTHETA VとTHETA Z1は映像を取得できないインターフェースがあるのでオミットする
 			// IsUVCEnabledと同様にUVC機器フィルターをインスペクタで設定できるようにする
+			// XXX The current implementation basically accepts all UVC devices
+			// However, THETA S, THETA V, and THETA Z1 have interfaces that cannot acquire images, so we will omit them.
+			// Allow the UVC equipment filter to be set in the inspector, similar to IsUVCEnabled
 			var result = !device.IsRicoh || device.IsTHETA;
 
 			result &= UVCFilter.Match(device, UVCFilters);
@@ -116,6 +143,10 @@ namespace Serenegiant.UVC
 		 * IOnUVCDetachEventHandlerの実装
 		 * @param manager 呼び出し元のUVCManager
 		 * @param device 対象となるUVC機器の情報
+		 * UVC equipment removed
+		 * Implementation of IOnUVCDetachEventHandler
+		 * @param manager UVCMager of the caller
+		 * @param device Information about the target UVC device
 		 */
 		public void OnUVCDetachEvent(UVCManager manager, UVCDevice device)
 		{
@@ -130,6 +161,11 @@ namespace Serenegiant.UVC
 //		 * @param manager 呼び出し元のUVCManager
 //		 * @param device 対象となるUVC機器の情報
 //		 * @param formats 対応している解像度についての情報
+//		 * Resolution selection
+//		 * Implementation of IOnUVCSelectSizeHandler
+//		 * @param manager UVCManager of the caller
+//		 * @param device Information about the target UVC device
+//		 * @param formats Information about supported resolutions
 //		 */
 //		public SupportedFormats.Size OnUVCSelectSize(UVCManager manager, UVCDevice device, SupportedFormats formats)
 //		{
@@ -164,6 +200,10 @@ namespace Serenegiant.UVC
 		 * IUVCDrawerの実装
 		 * @param manager 呼び出し元のUVCManager
 		 * @param device 対象となるUVC機器の情報
+		 * Get whether IUVCDrawer can draw the image of the specified UVC device
+		 * IUVCDrawer implementation
+		 * @param manager UVCMager of the caller
+		 * @param device Information about the target UVC device
 		 */
 		public bool IsUVCEnabled(UVCManager manager, UVCDevice device)
 		{
@@ -176,6 +216,11 @@ namespace Serenegiant.UVC
 		 * @param manager 呼び出し元のUVCManager
 		 * @param device 対象となるUVC機器の情報
 		 * @param tex UVC機器からの映像を受け取るTextureインスタンス
+		 * Started image acquisition
+		 * IUVCDrawer implementation
+		 * @param manager UVCMager of the caller
+		 * @param device Information about the target UVC device
+		 * @param tex Texture instance that receives the image from the UVC device
 		 */
 		public void OnUVCStartEvent(UVCManager manager, UVCDevice device, Texture tex)
 		{
@@ -190,6 +235,10 @@ namespace Serenegiant.UVC
 		 * IUVCDrawerの実装
 		 * @param manager 呼び出し元のUVCManager
 		 * @param device 対象となるUVC機器の情報
+		 * Image acquisition finished
+		 * IUVCDrawer implementation
+		 * @param manager UVCMager of the caller
+		 * @param device Information about the target UVC device
 		 */
 		public void OnUVCStopEvent(UVCManager manager, UVCDevice device)
 		{
@@ -205,6 +254,11 @@ namespace Serenegiant.UVC
 		 * IUVCDrawerの実装
 		 * @param manager 呼び出し元のUVCManager
 		 * @param device 対象となるUAC機器の情報
+		 * Get whether IUVCDrawer enables acquisition of audio from specified UAC device k
+		 * XXX For now, return true if the device supports UAC, rewrite as necessary.
+		 * IUVCDrawer implementation
+		 * @param manager UVCMager of the caller
+		 * @param device Information about the target UAC device
 		 */
 		public bool IsUACEnabled(UVCManager manager, UVCDevice device)
 		{
@@ -216,6 +270,10 @@ namespace Serenegiant.UVC
 		 * @param manager 呼び出し元のUVCManager
 		 * @param device 接続されたUVC機器情報
 		 * @param audioClip UAC機器からの音声を受け取るAudioClipオブジェクト
+		 * Started acquiring audio from UAC device
+		 * @param manager UVCMager of the caller
+		 * @param device Connected UVC device information
+		 * @param audioClip AudioClip object that receives audio from the UAC device
 		 */
 		public void OnUACStartEvent(UVCManager manager, UVCDevice device, AudioClip audioClip)
 		{
@@ -229,6 +287,9 @@ namespace Serenegiant.UVC
 		 * UAC機器からの音声取得を終了した
 		 * @param manager 呼び出し元のUVCManager
 		 * @param device 接続されたUVC機器情報
+		 * Ended audio acquisition from UAC device
+		 * @param manager UVCMager of the caller
+		 * @param device Connected UVC device information
 		 */
 		public void OnUACStopEvent(UVCManager manager, UVCDevice device)
 		{
@@ -241,6 +302,7 @@ namespace Serenegiant.UVC
 		//================================================================================
 		/**
 		 * 描画先を更新
+		 * Update drawing destination
 		 */
 		private void UpdateRenderTarget()
 		{
@@ -271,6 +333,9 @@ namespace Serenegiant.UVC
 			{   // 描画先が1つも見つからなかったときはこのスクリプトが
 				// AddComponentされているGameObjectからの取得を試みる
 				// XXX RenderTargetsにgameObjectをセットする？
+				// If no drawing destination is found, this script
+				// Attempt to get from the AddComponent GameObject
+				// Set gameObject to XXX RenderTargets?
 				TargetMaterials = new UnityEngine.Object[1];
 				SavedTextures = new Texture[1];
 				quaternions = new Quaternion[1];
@@ -291,10 +356,17 @@ namespace Serenegiant.UVC
 		 * 優先度: Skybox > Renderer > RawImage > Material
 		 * @param target
 		 * @return 見つからなければnullを返す
+		 * Get the Material to draw the image as a texture
+		 * If the specified GameObject has Skybox/Renderer/RawImage/Material, get the Material from it.
+		 * If each is allocated multiple times, return the first available one found.
+		 * Priority: Skybox > Renderer > RawImage > Material
+		 * @param target
+		 * @return Returns null if not found
 		 */
 		UnityEngine.Object GetTargetMaterial(GameObject target/*NonNull*/)
 		{
 			// Skyboxの取得を試みる
+			// try to get Skybox
 			var skyboxs = target.GetComponents<Skybox>();
 			if (skyboxs != null)
 			{
@@ -308,6 +380,7 @@ namespace Serenegiant.UVC
 				}
 			}
 			// Skyboxが取得できなければRendererの取得を試みる
+			// If Skybox cannot be obtained, try to obtain Renderer.
 			var renderers = target.GetComponents<Renderer>();
 			if (renderers != null)
 			{
@@ -321,6 +394,7 @@ namespace Serenegiant.UVC
 				}
 			}
 			// SkyboxもRendererも取得できなければRawImageの取得を試みる
+			// If neither Skybox nor Renderer can be obtained, try to obtain Raw Image.
 			var rawImages = target.GetComponents<RawImage>();
 			if (rawImages != null)
 			{
@@ -334,6 +408,7 @@ namespace Serenegiant.UVC
 				}
 			}
 			// SkyboxもRendererもRawImageも取得できなければMaterialの取得を試みる
+			// If neither Skybox nor Renderer nor Raw Image can be obtained, try to obtain Material.
 			var material = target.GetComponent<Material>();
 			if (material != null)
 			{
@@ -378,6 +453,8 @@ namespace Serenegiant.UVC
 		/**
 		 * 映像取得開始時の処理
 		 * @param tex 映像を受け取るテクスチャ
+		 * Processing at the start of image acquisition
+		 * @param tex Texture to receive the image
 		 */
 		private void HandleOnStartPreview(Texture tex)
 		{
@@ -408,6 +485,7 @@ namespace Serenegiant.UVC
 
 		/**
 		 * 映像取得が終了したときのUnity側の処理
+		 * Processing on the Unity side when image acquisition is finished
 		 */
 		private void HandleOnStopPreview()
 		{
@@ -415,6 +493,7 @@ namespace Serenegiant.UVC
 			Console.WriteLine($"{TAG}HandleOnStopPreview:");
 #endif
 			// 描画先のテクスチャをもとに戻す
+			// Restore the drawing destination texture
 			RestoreTexture();
 #if (!NDEBUG && DEBUG && ENABLE_LOG)
 			Console.WriteLine($"{TAG}HandleOnStopPreview:finished");
@@ -423,6 +502,7 @@ namespace Serenegiant.UVC
 
 		/**
 		 * UACの音声再生を行うAudioSourceを取得する
+		 * Obtain the Audio Source for UAC audio playback
 		 */
 		private AudioSource GetAudioSource()
 		{
@@ -447,6 +527,7 @@ namespace Serenegiant.UVC
 
 		/**
 		 * 音声取得開始した時のUnity側の処理
+		 * Processing on the Unity side when audio acquisition starts
 		 * @param audioClip
 		 */
 		private void HandleOnStartAudio(AudioClip audioClip)
@@ -465,6 +546,7 @@ namespace Serenegiant.UVC
 
 		/**
 		 * 音声取得終了した時のUnity側の処理
+		 * Processing on the Unity side when audio acquisition is finished
 		 */
 		private void HandleOnStopAudio()
 		{

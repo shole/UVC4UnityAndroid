@@ -36,12 +36,14 @@ namespace Serenegiant
 		//--------------------------------------------------------------------------------
 		/**
 		 * ライフサイクルイベント用のデリゲーター
+		 * Delegator for lifecycle events
 		 * @param resumed true: onResume, false: onPause
 		 */
 		public delegate void LifecycleEventHandler(bool resumed);
 
 		/***
 		 * GrantPermissionでパーミッションを要求したときのコールバック用delegateer
+		 * Delegate for callback when requesting permission with Grant Permission
 		 * @param permission
 		 * @param grantResult 0:grant, -1:deny, -2:denyAndNeverAskAgain
 		*/
@@ -50,6 +52,7 @@ namespace Serenegiant
 		//--------------------------------------------------------------------------------
 		/**
 		 * パーミッション要求時のタイムアウト
+		 * Timeout when requesting permission
 		 */
 		public static float PermissionTimeoutSecs = 30;
 	
@@ -64,13 +67,16 @@ namespace Serenegiant
 			Console.WriteLine($"{TAG}Awake:");
 #endif
 #if UNITY_ANDROID
-			Input.backButtonLeavesApp = true;   // 端末のバックキーでアプリを終了できるようにする
+			// 端末のバックキーでアプリを終了できるようにする
+			// Allow the device's back key to exit the app
+			Input.backButtonLeavesApp = true;
 			Initialize();
 #endif
 		}
 
 		//--------------------------------------------------------------------------------
 		// Java側からのイベントコールバック
+		// Event callbacks from the Java side
 
 		/**
 		 * onStartイベント
@@ -116,6 +122,7 @@ namespace Serenegiant
 
 		/**
 		 * パーミッションを取得できた
+		 * Permission was obtained
 		 */
 		public void OnPermissionGrant()
 		{
@@ -128,6 +135,7 @@ namespace Serenegiant
 
 		/**
 		 * パーミッションを取得できなかった
+		 * Permission could not be obtained
 		 */
 		public void OnPermissionDeny()
 		{
@@ -140,6 +148,7 @@ namespace Serenegiant
 
 		/**
 		 * パーミッションを取得できずパーミッションダイアログを再び表示しないように設定された
+		 * Permission cannot be obtained and permission dialog is set not to be displayed again
 		 */
 		public void OnPermissionDenyAndNeverAskAgain()
 		{
@@ -154,6 +163,7 @@ namespace Serenegiant
 #if UNITY_ANDROID
 		/**
 		 * プラグインの初期化実行
+		 * Initialization of the plug-in
 		 */
 		private void Initialize()
 		{
@@ -169,8 +179,10 @@ namespace Serenegiant
 
 		/**
 		 * 指定したパーミッションを保持しているかどうかを取得
+		 * Retrieves whether the specified permission is held
 		 * @param permission
 		 * @param 指定したパーミッションを保持している
+		 * @param You have the specified permissions.
 		 */
 		public static bool HasPermission(string permission)
 		{
@@ -183,8 +195,10 @@ namespace Serenegiant
 
 		/**
 		 * 指定したパーミッションの説明を表示する必要があるかどうかを取得
+		 * Gets whether the description of the specified permission should be displayed
 		 * @param permission
 		 * @param 指定したパーミッションの説明を表示する必要がある
+		 * @param You need to display a description of the specified permission.
 		 */
 		public static bool ShouldShowRequestPermissionRationale(string permission)
 		{
@@ -198,6 +212,8 @@ namespace Serenegiant
 		/**
 		 * パーミッション要求
 		 * こっちはJava側でRationaleの処理等を行わない
+		 * Permission Requests
+		 * This does not perform Rationale processing on the Java side.
 		 * @param permission
 		 * @param callback
 		 */
@@ -239,6 +255,8 @@ namespace Serenegiant
 		/**
 		 * パーミッション要求
 		 * こっちはJava側でRationaleの処理等を行う
+		 * Permission Requests
+		 * This is done on the Java side for Rationale processing, etc.
 		 * @param permission
 		 * @param callback
 		 */
@@ -279,6 +297,7 @@ namespace Serenegiant
 
 		/**
 		 * カメラパーミッションを要求
+		 * Request Camera Permission
 		 * @param callback
 		 */
 		public static IEnumerator GrantCameraPermission(OnPermission callback)
@@ -289,11 +308,13 @@ namespace Serenegiant
 			if (CheckAndroidVersion(23))
 			{
 				// Android9以降ではUVC機器アクセスにもCAMERAパーミッションが必要
+				// In Android 9 or later, CAMERA permission is required for UVC device access.
 				yield return GrantPermission(PERMISSION_CAMERA, callback);
 			}
 			else
 			{
 				// Android 6 未満ではパーミッション要求処理は不要
+				// Less than Android 6 does not require permission request processing
 				callback(PERMISSION_CAMERA, PermissionGrantResult.PERMISSION_GRANT);
 			}
 
@@ -305,6 +326,7 @@ namespace Serenegiant
 
 		/**
 		 * UnityPlayerActivityを取得
+		 * Get the UnityPlayerActivity
 		 */
 		public static AndroidJavaObject GetCurrentActivity()
 		{
@@ -316,8 +338,10 @@ namespace Serenegiant
 
 		/**
 		 * 指定したバージョン以降かどうかを確認
+		 * Check if it is at least the specified version
 		 * @param apiLevel
 		 * @return true: 指定したバージョン以降で実行されている, false: 指定したバージョンよりも古い端末で実行されている
+		 * @return true: running on a device running on a specified version or later, false: running on a device older than the specified version
 		 */
 		public static bool CheckAndroidVersion(int apiLevel)
 		{
