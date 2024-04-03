@@ -321,7 +321,8 @@ namespace Serenegiant.UVC
 			{
 				if (ctrlInfos.ContainsKey(type))
 				{
-					return ctrlInfos.GetValueOrDefault(type, new UVCCtrlInfo());
+					// return ctrlInfos.GetValueOrDefault(type, new UVCCtrlInfo());
+					return ctrlInfos[type];
 				} else
 				{
 					throw new ArgumentOutOfRangeException($"Not supported control type{type:X}");
@@ -372,7 +373,8 @@ namespace Serenegiant.UVC
 						r = GetCtrlValue(Id, type, ref value);
 						if (r == 0)
 						{
-							var info = ctrlInfos.GetValueOrDefault(type, new UVCCtrlInfo());
+							// var info = ctrlInfos.GetValueOrDefault(type, new UVCCtrlInfo());
+							var info = ctrlInfos[type];
 							info.current = value;
 							ctrlInfos[type] = info;
 							return value;
