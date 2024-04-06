@@ -1,4 +1,5 @@
-﻿//#define ENABLE_LOG
+﻿#define ENABLE_LOG
+#define DEBUG
 /*
  * Copyright (c) 2014 - 2022 t_saki@serenegiant.com 
  */
