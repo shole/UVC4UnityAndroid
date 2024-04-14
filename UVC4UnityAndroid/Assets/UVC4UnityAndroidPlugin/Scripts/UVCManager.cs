@@ -524,6 +524,7 @@ namespace Serenegiant.UVC
 			private UACInfo info = new UACInfo();
 			private int samplesPerFrame = 0;
 			private Int16[] buffer;	// 今のところPCM16にしか対応しない, OnPCM16Readないではなくここで保持するともしかするとメモリーブロックが不連続になったり移動したりするかもしれないけど
+									// Currently, it only supports PCM16, but if you keep it here instead of OnPCM16Read, the memory block may become discontinuous or move.
 			private volatile AudioClip audioClip;
 			private volatile Int32 activeId;
 
@@ -561,7 +562,7 @@ namespace Serenegiant.UVC
 #endif
 						try
 						{
-							// PCM16のはず
+							// Should be PCM 16
 							activeId = device.id;
 							samplesPerFrame = info.packetBytes / (info.resolution / 8);
 							buffer = new Int16[samplesPerFrame];
@@ -691,8 +692,8 @@ namespace Serenegiant.UVC
 		// Call from Unity Engine
 		//--------------------------------------------------------------------------------
 		// Start is called before the first frame update
-		IEnumerator Start()
-		{
+		IEnumerator Start() {
+			yield return new WaitForSeconds(5);
 #if (!NDEBUG && DEBUG && ENABLE_LOG)
 			Console.WriteLine($"{TAG}Start:");
 #endif
@@ -703,9 +704,9 @@ namespace Serenegiant.UVC
 		}
 
 #if (!NDEBUG && DEBUG && ENABLE_LOG)
-		void OnApplicationFocus()
+		void OnApplicationFocus(bool hasFocus)
 		{
-			Console.WriteLine($"{TAG}OnApplicationFocus:");
+			Console.WriteLine($"{TAG}OnApplicationFocus: {hasFocus}");
 		}
 #endif
 
@@ -907,7 +908,7 @@ namespace Serenegiant.UVC
 							TextureFormat.ARGB32,
 							false, /* mipmap */
 							true /* linear */);
-					tex.filterMode = FilterMode.Point;
+					tex.filterMode = FilterMode.Bilinear;
 					tex.Apply();
 					info.previewTexture = tex;
 					var nativeTexPtr = info.previewTexture.GetNativeTexturePtr();
@@ -922,6 +923,9 @@ namespace Serenegiant.UVC
 			var info = GetCamera(device);
 			if ((info != null) && info.IsPreviewing)
 			{
+#if (!NDEBUG && DEBUG && ENABLE_LOG)
+				Console.WriteLine($"{TAG}StopPreview:id={device.id}");
+#endif
 				mainContext.Post(__ =>
 				{
 					HandleOnStopPreviewEvent(info);
@@ -1009,11 +1013,13 @@ namespace Serenegiant.UVC
 						hasDrawer = true;
 						if ((drawer as IUVCDrawer).OnUVCAttachEvent(this, device))
 						{   // どれか1つのIUVCDrawerがtrueを返せばtrue(接続されたUVC機器を使用する)を返す
+							// Returns true (uses connected UVC device) if any one IUVC Drawer returns true.
 							return true;
 						}
 					}
 				}
 				// IUVCDrawerが割り当てられていないときはtrue(接続されたUVC機器を使用する)を返す
+				// Returns true (uses connected UVC device) when no IUVC Drawer is assigned
 				return !hasDrawer;
 			}
 		}

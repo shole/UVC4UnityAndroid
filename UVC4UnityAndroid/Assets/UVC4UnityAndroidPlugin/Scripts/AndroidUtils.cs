@@ -70,7 +70,7 @@ namespace Serenegiant
 #if UNITY_ANDROID
 			// 端末のバックキーでアプリを終了できるようにする
 			// Allow the device's back key to exit the app
-			Input.backButtonLeavesApp = true;
+			// Input.backButtonLeavesApp = true;
 			Initialize();
 #endif
 		}
@@ -351,9 +351,7 @@ namespace Serenegiant
 				return VERSION.GetStatic<int>("SDK_INT") >= apiLevel;
 			}
 		}
-
-	} // class AndroidUtils
+#endif // #if UNITY_ANDROID
+	}  // class AndroidUtils
 
 } // namespace Serenegiant
-
-#endif // #if UNITY_ANDROID
